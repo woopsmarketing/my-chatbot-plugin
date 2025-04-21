@@ -27,6 +27,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 if not OPENAI_API_KEY:
     raise Exception("OPENAI_API_KEY 환경 변수를 설정하세요.")
 
+ALLOWED_ORIGIN = os.getenv("ALLOWED_ORIGIN", "*")
 
 # 1) FastAPI 인스턴스
 app = FastAPI()
@@ -46,7 +47,7 @@ class CustomCORSMiddleware(BaseHTTPMiddleware):
         if request.method == "OPTIONS":
             # 브라우저가 preflight 요청을 보낼 때
             headers = {
-                "Access-Control-Allow-Origin": "https://majortoto789.com",
+                "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
                 "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
                 "Access-Control-Allow-Headers": "content-type,x-session-id",
                 "Access-Control-Allow-Credentials": "true",
@@ -56,7 +57,7 @@ class CustomCORSMiddleware(BaseHTTPMiddleware):
         # 일반 요청
         response = await call_next(request)
         # 일반 요청에도 Origin과 Credentials 헤더를 설정
-        response.headers["Access-Control-Allow-Origin"] = "https://majortoto789.com"
+        response.headers["Access-Control-Allow-Origin"] = ALLOWED_ORIGIN
         response.headers["Access-Control-Allow-Credentials"] = "true"
         return response
 
