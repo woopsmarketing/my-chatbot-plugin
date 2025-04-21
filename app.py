@@ -42,27 +42,18 @@ app = FastAPI()
 # )
 
 
-class CustomCORSMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request, call_next):
-        if request.method == "OPTIONS":
-            # 브라우저가 preflight 요청을 보낼 때
-            headers = {
-                "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
-                "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
-                "Access-Control-Allow-Headers": "content-type,x-session-id",
-                "Access-Control-Allow-Credentials": "true",
-                "Access-Control-Allow-Private-Network": "true",
-            }
-            return StarletteResponse(status_code=200, headers=headers)
-        # 일반 요청
-        response = await call_next(request)
-        # 일반 요청에도 Origin과 Credentials 헤더를 설정
-        response.headers["Access-Control-Allow-Origin"] = ALLOWED_ORIGIN
-        response.headers["Access-Control-Allow-Credentials"] = "true"
-        return response
-
-
-app.add_middleware(CustomCORSMiddleware)
+# ─────────────────────────────────────────────────────────────────
+# CORS 설정: 들어오는 어떤 Origin 이든(=["*"]) credentials 허용하면서 echo
+# ─────────────────────────────────────────────────────────────────
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        ALLOWED_ORIGIN
+    ],  # "*" 이 들어오면 실제 요청 Origin 을 echo 해 줍니다
+    allow_credentials=True,  # 쿠키/인증헤더(x-session-id) 전송 허용
+    allow_methods=["*"],  # GET, POST, OPTIONS 등 모두 허용
+    allow_headers=["*"],  # content-type, x-session-id 등 모두 허용
+)
 
 
 # 리드 데이터 스키마 (양식 제출용)
