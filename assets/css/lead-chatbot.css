@@ -1,0 +1,395 @@
+/* 1. 전체 래퍼: 양식 및 챗봇 위젯 컨테이너 */
+/* 전체 레이아웃에 오렌지 톤 포인트(여기선 border와 box-shadow에 활용)와 깔끔한 디자인 적용 */
+#lead-chatbot-wrapper {
+  max-width: 700px;
+  margin: 30px auto;
+  padding: 20px;
+  background-color: #ffffff;
+  border: 2px solid #ff9800; /* 오렌지 계열의 포인트 컬러 */
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(255,152,0,0.3); /* 오렌지빛 그림자 */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  position: relative;
+  z-index: 1000;
+  overflow: hidden;  /* 내부 오버플로우를 감춤 */
+}
+
+/* 2. 리드폼 스타일: 입력폼 디자인을 오렌지 계열의 포인트와 깔끔한 레이아웃으로 수정 */
+#lead-form {
+  background-color: #fff3e0; /* 연한 오렌지 배경 */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+#lead-form label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #333;
+}
+#lead-form input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ffcc80;
+  border-radius: 4px;
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+#lead-form input:focus {
+  border-color: #ff9800;
+}
+#lead-form button {
+  padding: 14px 28px;
+  background-color: #ff9800;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.1s;
+  width: 100%;
+}
+#lead-form button:hover {
+  background-color: #e68900;
+}
+#lead-form button:active {
+  transform: scale(0.98);
+}
+
+/* 성공 메시지 - 양식 제출 후 표시 (2초 후 자동 전환은 JS에서 제어) */
+#lead-success {
+  display: none;
+  background-color: #fff8e1;
+  border: 1px solid #ffe0b2;
+  padding: 16px;
+  text-align: center;
+  border-radius: 4px;
+  font-size: 1.1rem;
+  color: #ff9800;
+  margin-top: 20px;
+}
+
+/* 3. 챗봇 UI 컨테이너 */
+#chatbox {
+  display: none;
+  flex-direction: column;
+  margin-top: 20px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+  height: 800px;  /* 챗봇 영역 높이 조절 */
+  overflow: hidden;
+  position: relative;
+}
+
+/* 4. 챗봇 헤더 - 탑 배너 */
+.chatbox-header {
+  background-color: #0073aa;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap; /* 버튼 2개+텍스트가 줄바꿈 가능하게 */
+  box-sizing: border-box;
+}
+.chatbox-header span {
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  flex: 1 0 100%; /* span이 한 줄을 꽉 차지하도록 */
+  margin-bottom: 8px; 
+  white-space: normal;
+}
+.chatbox-header .header-btn {
+  background-color: #ff5c5c;
+  border: none;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s, transform 0.1s;
+  margin-right: 8px; /* 버튼 간격 */
+  margin-bottom: 6px; /* wrap 시 아래 여백 */
+}
+.chatbox-header .header-btn:hover {
+  background-color: #ff3b3b;
+}
+.chatbox-header .header-btn:active {
+  transform: scale(0.98);
+}
+
+/* 5. 채팅 메시지 영역 */
+#chat-messages {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 40px;
+  flex: 1;
+  overflow-y: auto;
+  background-color: #fff;
+  border-top: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* 6. 사용자 메시지 스타일 */
+.user-message {
+  align-self: flex-start;
+  background-color: #f0f0f0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  margin: 8px;
+  max-width: 70%;
+  position: relative;
+  font-size: 1.05rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.user-message::before {
+  content: "👤";
+  position: absolute;
+  left: -28px;
+  top: 0;
+  font-size: 1.2rem;
+}
+.user-message::after {
+  content: "";
+  position: absolute;
+  left: -10px;
+  top: 10px;
+  border-style: solid;
+  border-width: 10px 10px 10px 0;
+  border-color: transparent #f0f0f0 transparent transparent;
+}
+
+/* 7. 상담원 메시지 스타일 */
+.agent-message {
+  align-self: flex-end;
+  background-color: #ffe0b2;
+  padding: 10px 14px;
+  border-radius: 12px;
+  margin: 8px;
+  max-width: 70%;
+  position: relative;
+  font-size: 1.05rem;
+  width: fit-content;
+  font-family: Arial, sans-serif;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+.agent-message::before {
+  content: "🤖";
+  position: absolute;
+  right: -28px;
+  top: 0;
+  font-size: 1.2rem;
+}
+.agent-message::after {
+  content: "";
+  position: absolute;
+  right: -10px;
+  top: 10px;
+  border-style: solid;
+  border-width: 10px 0 10px 10px;
+  border-color: transparent transparent transparent #ffe0b2;
+}
+
+/* 마크다운 내용 스타일 (챗봇 답변 내부) */
+.agent-message p,
+.agent-message ul,
+.agent-message ol,
+.agent-message li {
+  margin: 0.4em 0;
+}
+.agent-message h1,
+.agent-message h2,
+.agent-message h3 {
+  margin: 0.6em 0 0.3em 0;
+  font-weight: bold;
+}
+.agent-message ul,
+.agent-message ol {
+  padding-left: 1.2em;
+}
+.agent-message strong {
+  font-weight: 600;
+}
+
+/* 8. Typing Indicator (상담원 답변중 애니메이션) */
+.typing-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.typing-indicator span {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background-color: #888;
+  border-radius: 50%;
+  opacity: 0.5;
+  animation: dotFlashing 1.2s infinite ease-in-out;
+}
+.typing-indicator span:nth-child(1) { animation-delay: 0s; }
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes dotFlashing {
+  0% {
+    opacity: 0.5;
+    transform: scale(0.8);
+    background-color: #888;
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+    background-color: #555;
+  }
+  100% {
+    opacity: 0.5;
+    transform: scale(0.8);
+    background-color: #888;
+  }
+}
+
+/* 9. 채팅 입력 영역 (항상 화면 아래 고정) */
+#chat-input-area {
+  display: flex;
+  background-color: #fafafa;
+  padding: 10px;
+  border-top: 1px solid #e0e0e0;
+}
+#chat-input {
+  flex: 1;
+  padding: 12px;
+  font-size: 1.1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+#chat-input-area button {
+  padding: 12px 20px;
+  margin-left: 8px;
+  background-color: #0073aa;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: background-color 0.3s, transform 0.1s;
+}
+#chat-input-area button:hover {
+  background-color: #005e8c;
+}
+#chat-input-area button:active {
+  transform: scale(0.98);
+}
+
+/* 10. 데스크톱/모바일 공통 추가 버튼 스타일 */
+.action-btn, .inquiry-btn {
+  background-color: #0073aa;
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s, transform 0.1s;
+  margin-top: 10px;
+}
+.action-btn:hover, .inquiry-btn:hover {
+  background-color: #005e8c;
+}
+.action-btn:active, .inquiry-btn:active {
+  transform: scale(0.98);
+}
+
+/* --- 모바일 전용 전체화면 오버레이 --- */
+@media (max-width: 768px) {
+  /* 전체화면 오버레이 컨테이너 */
+  .full-screen-chat {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 10000;
+    background-color: #ffffff;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  /* 챗봇 나가기 버튼 (전체화면 오버레이 상태에서 중앙 하단에 고정) */
+  .full-screen-chat .exit-chat-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ff5c5c;
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    z-index: 10001;
+    transition: background-color 0.3s, transform 0.1s;
+  }
+  .full-screen-chat .exit-chat-btn:hover {
+    background-color: #ff3b3b;
+  }
+  .full-screen-chat .exit-chat-btn:active {
+    transform: scale(0.98);
+  }
+  
+  /* 채팅 입력 영역: 화면 맨 아래 고정, 안전영역 고려 */
+  .full-screen-chat #chat-input-area {
+    position: sticky;
+    bottom: 0;
+    background-color: #fafafa;
+    padding: 10px;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 10002;
+  }
+  
+  /* 채팅 메시지 영역 패딩 축소 */
+  #chat-messages {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  
+  /* 텍스트 크기 및 말풍선 크기 조정 */
+  .user-message, .agent-message {
+    max-width: 85%;
+    font-size: 0.95rem;
+  }
+  
+  .user-message::before {
+    left: -20px;
+    font-size: 1rem;
+  }
+  .agent-message::before {
+    right: -20px;
+    font-size: 1rem;
+  }
+}
+
+
+/* 오렌지 계열의 채팅창 펼치기 버튼 */
+#expand-chat-btn {
+  background-color: #ff9c55; /* 주황빛 예시 */
+  color: #fff;
+  border: none;
+  border-radius: 20px; 
+  font-size: 1rem;
+  padding: 10px 20px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  transition: background-color 0.3s, transform 0.1s;
+}
+#expand-chat-btn:hover {
+  background-color: #ff7f22;
+}
+#expand-chat-btn:active {
+  transform: scale(0.97);
+}
